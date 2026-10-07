@@ -6,8 +6,9 @@ import { ArrowLeft, Save, CheckCircle, XCircle, AlertCircle } from 'lucide-react
 import Link from 'next/link';
 import { toast } from 'sonner';
 import styles from './invoice-detail.module.css';
+import { Suspense } from 'react';
 
-export default function InvoiceDetail() {
+function InvoiceDetailContent() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
@@ -339,5 +340,13 @@ export default function InvoiceDetail() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function InvoiceDetail() {
+  return (
+    <Suspense fallback={<div className={styles.loadingState}>Loading invoice details...</div>}>
+      <InvoiceDetailContent />
+    </Suspense>
   );
 }

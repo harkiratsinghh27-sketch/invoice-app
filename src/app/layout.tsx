@@ -28,7 +28,7 @@ export default function RootLayout({
       <body>
         <Providers>
           <div style={{ display: 'flex', minHeight: '100vh', width: '100vw' }}>
-            <Suspense fallback={<Sidebar hasInvoices={true} />}>
+            <Suspense fallback={<div style={{ width: '250px', backgroundColor: 'var(--bg-secondary)' }} />}>
               <SidebarContainer />
             </Suspense>
             <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>

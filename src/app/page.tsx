@@ -7,6 +7,8 @@ import SpendChart from '@/components/SpendChart';
 
 const prisma = new PrismaClient();
 
+export const instant = false;
+
 export default async function Dashboard() {
   const invoiceCount = await prisma.invoice.count();
   

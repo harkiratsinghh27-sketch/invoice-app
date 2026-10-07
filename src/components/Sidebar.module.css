@@ -1,0 +1,76 @@
+.sidebar {
+  width: 260px;
+  background-color: var(--nav-bg);
+  color: var(--nav-text);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--nav-border);
+  flex-shrink: 0;
+  height: 100vh;
+}
+
+.logo {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.logoIcon {
+  width: 24px;
+  height: 24px;
+  background: var(--accent-primary);
+  border-radius: 6px;
+}
+
+.logoText {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px;
+  gap: 4px;
+  flex: 1;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--nav-text-muted);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.navItem:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--nav-text);
+}
+
+.navItem.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--nav-text);
+}
+
+.icon {
+  opacity: 0.8;
+}
+
+.navItem.active .icon {
+  opacity: 1;
+  color: var(--accent-primary);
+}
+
+.bottomNav {
+  padding: 16px;
+  margin-top: auto;
+  border-top: 1px solid var(--nav-border);
+}

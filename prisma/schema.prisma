@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  name      String?
+  createdAt DateTime  @default(now())
+  invoices  Invoice[]
+  chats     Chat[]
+}
+
+model Invoice {
+  id               String       @id @default(uuid())
+  userId           String
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Metadata
+  vendorName       String?
+  vendorAddress    String?
+  invoiceNumber    String?
+  invoiceDate      DateTime?
+  dueDate          DateTime?
+  currency         String?
+  
+  // Financials
+  subtotal         Float?
+  tax              Float?
+  discount         Float?
+  total            Float?
+  
+  // Status & System
+  status           String       @default("PENDING") // PENDING, REVIEWED, APPROVED, REJECTED
+  processingStatus String       @default("PROCESSING") // UPLOADING, PROCESSING, EXTRACTING, COMPLETED, FAILED
+  originalFileName String?
+  fileUrl          String?      // Reference to stored file
+  
+  // Confidence metadata (could be stored as JSON if supported, or individual fields)
+  confidenceScore  Float?       // Overall confidence
+  
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  lineItems        LineItem[]
+}
+
+model LineItem {
+  id          String   @id @default(uuid())
+  invoiceId   String
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  
+  description String?
+  quantity    Float?
+  unitPrice   Float?
+  tax         Float?
+  total       Float?
+}
+
+model Chat {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  messages  Message[]
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  chatId    String
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  
+  role      String   // user or assistant
+  content   String
+  createdAt DateTime @default(now())
+}

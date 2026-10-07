@@ -6,16 +6,16 @@ import { format } from 'date-fns';
 import InvoiceActions from './InvoiceActions';
 import SearchInput from './SearchInput';
 import FilterDropdown from './FilterDropdown';
+import { connection } from 'next/server';
 
 const prisma = new PrismaClient();
-
-export const instant = false;
 
 export default async function InvoicesPage({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
+  await connection();
   const { q, status } = await searchParams;
   const query = typeof q === 'string' ? q : undefined;
   const statusFilter = typeof status === 'string' && status !== 'ALL' ? status : undefined;

@@ -4,12 +4,12 @@ import Link from 'next/link';
 import { PrismaClient } from '@prisma/client';
 import { redirect } from 'next/navigation';
 import SpendChart from '@/components/SpendChart';
+import { connection } from 'next/server';
 
 const prisma = new PrismaClient();
 
-export const instant = false;
-
 export default async function Dashboard() {
+  await connection();
   const invoiceCount = await prisma.invoice.count();
   
   if (invoiceCount === 0) {

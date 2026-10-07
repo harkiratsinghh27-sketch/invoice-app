@@ -13,9 +13,7 @@ export const metadata: Metadata = {
 };
 
 async function SidebarContainer() {
-  const invoiceCount = await prisma.invoice.count();
-  const hasInvoices = invoiceCount > 0;
-  return <Sidebar hasInvoices={hasInvoices} />;
+  return <Sidebar hasInvoices={true} />;
 }
 
 export default function RootLayout({

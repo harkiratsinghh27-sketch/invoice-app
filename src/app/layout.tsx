@@ -3,9 +3,7 @@ import { Suspense } from "react";
 import Sidebar from "@/components/Sidebar";
 import Providers from "@/components/Providers";
 import "./globals.css";
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export const metadata: Metadata = {
   title: "AI Invoice Manager",

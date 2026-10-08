@@ -6,8 +6,7 @@ import { format } from 'date-fns';
 import InvoiceActions from './InvoiceActions';
 import SearchInput from './SearchInput';
 import FilterDropdown from './FilterDropdown';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 

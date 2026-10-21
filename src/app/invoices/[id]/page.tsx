@@ -45,6 +45,33 @@ function InvoiceDetailContent() {
     fetchInvoice();
   }, [id]);
 
+  const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (invoice?.fileUrl?.startsWith('data:application/pdf;base64,')) {
+      try {
+        const base64 = invoice.fileUrl.split(',')[1];
+        const byteCharacters = atob(base64);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        setPdfBlobUrl(url);
+        return () => URL.revokeObjectURL(url);
+      } catch (e) {
+        console.error("Failed to parse base64 PDF", e);
+        setPdfBlobUrl(invoice.fileUrl);
+      }
+    } else if (invoice?.fileUrl) {
+      setPdfBlobUrl(invoice.fileUrl);
+    } else {
+      setPdfBlobUrl(null);
+    }
+  }, [invoice?.fileUrl]);
+
   const handleInputChange = (field: string, value: any) => {
     setInvoice({ ...invoice, [field]: value });
   };
@@ -123,17 +150,17 @@ function InvoiceDetailContent() {
       <div className={styles.splitView}>
         {/* Left Side - Document Preview */}
         <div className={styles.documentPanel}>
-          {invoice.fileUrl ? (
-            invoice.fileUrl.toLowerCase().endsWith('.pdf') ? (
+          {pdfBlobUrl ? (
+            (invoice.fileUrl?.toLowerCase().endsWith('.pdf') || invoice.fileUrl?.startsWith('data:application/pdf')) ? (
               <iframe 
-                src={invoice.fileUrl} 
+                src={pdfBlobUrl} 
                 className={styles.documentViewer}
                 title="Invoice Document"
               />
             ) : (
               <div className={styles.imageViewerContainer}>
                 <img 
-                  src={invoice.fileUrl} 
+                  src={pdfBlobUrl} 
                   alt="Invoice Document" 
                   className={styles.imageViewer} 
                 />

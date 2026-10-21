@@ -95,17 +95,24 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Save file locally for preview
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-    await fs.mkdir(uploadDir, { recursive: true });
+    let fileUrl = "";
     
-    const extension = file.name.split('.').pop() || 'pdf';
-    // Use a unique ID for the filename
-    const uniqueFilename = `${Date.now()}-${Math.random().toString(36).substring(7)}.${extension}`;
-    const filePath = path.join(uploadDir, uniqueFilename);
-    
-    await fs.writeFile(filePath, buffer);
-    const fileUrl = `/uploads/${uniqueFilename}`;
+    // In Vercel serverless environment, we cannot write to the public folder.
+    // Since this is a demo, we will store the file as a base64 data URL directly in the database.
+    if (process.env.VERCEL === "1") {
+      fileUrl = `data:${file.type};base64,${base64File}`;
+    } else {
+      // Save file locally for preview
+      const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+      await fs.mkdir(uploadDir, { recursive: true });
+      
+      const extension = file.name.split('.').pop() || 'pdf';
+      const uniqueFilename = `${Date.now()}-${Math.random().toString(36).substring(7)}.${extension}`;
+      const filePath = path.join(uploadDir, uniqueFilename);
+      
+      await fs.writeFile(filePath, buffer);
+      fileUrl = `/uploads/${uniqueFilename}`;
+    }
 
     // Save to Database
     const invoice = await prisma.invoice.create({

@@ -1,80 +1,79 @@
-# Smart Invoice AI — Multimodal Financial Document Extraction & Reconciled AP Intelligence
+# Smart Invoice AI
 
-[![Next.js 16](https://img.shields.io/badge/Next.js-16.4.0-black?style=flat&logo=next.js)](https://nextjs.org/)
-[![React 19](https://img.shields.io/badge/React-19.3.0-blue?style=flat&logo=react)](https://react.dev/)
+> Automated invoice and receipt processing platform with multimodal vision extraction, arithmetic reconciliation, and conversational accounts payable analytics.
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-invoice--app--jade--one.vercel.app-2563EB?style=flat)](https://invoice-app-jade-one.vercel.app)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16.4-black?style=flat&logo=next.js)](https://nextjs.org/)
+[![React 19](https://img.shields.io/badge/React-19.3-blue?style=flat&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 [![Prisma ORM](https://img.shields.io/badge/ORM-Prisma%205.22-2D3748?style=flat&logo=prisma)](https://www.prisma.io/)
 [![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-336791?style=flat&logo=postgresql)](https://www.postgresql.org/)
-[![Multimodal AI](https://img.shields.io/badge/AI-Gemini%202.5%20Vision-4285F4?style=flat&logo=google)](https://ai.google.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-> **Smart Invoice AI** is an intelligent document processing engine that extracts, validates, and reconciles financial invoices and receipts using multimodal LLMs. It features zero-hallucination line-item parsing, automated math reconciliation, and an interactive conversational Accounts Payable (AP) copilot.
+**Live Production URL:** [https://invoice-app-jade-one.vercel.app](https://invoice-app-jade-one.vercel.app)
 
 ---
 
-## 📌 Executive Summary
+## Overview
 
-Manual invoice processing is notorious for costly human error, slow turnaround, and vulnerability to duplicate billings. Traditional OCR tools fail on skewed angles, irregular layouts, and multi-currency formats.
+Smart Invoice AI is an intelligent document processing application designed to eliminate manual data entry from accounts payable workflows. It converts physical receipts, scanned documents, and digital PDFs into validated financial records.
 
-**Smart Invoice AI** replaces brittle OCR templates with **frontier multimodal vision models (Google Gemini 2.5 / Claude 3.5 Sonnet)**. The system ingests raw camera captures, scans, and multi-page PDFs, converts them into strictly typed JSON structures, verifies line-item arithmetic against totals, stores validated records in PostgreSQL via Prisma, and enables natural language financial analytics through a conversational copilot.
+Unlike legacy OCR templates that break when layouts shift, the platform uses **Google Gemini 2.5 Flash Multimodal Vision** with strictly enforced JSON schemas. Extracted records undergo server-side arithmetic checks to verify line-item sums against stated totals before being written to PostgreSQL via Prisma ORM.
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ```mermaid
 flowchart TD
-    User([👤 AP Specialist / Finance Team]) <-->|Upload PDF / Scan / Camera Capture| Client[🖥️ Next.js 16 Frontend Dashboard]
+    User([User / Accounts Payable]) <-->|Upload PDF or Camera Scan| Frontend[Next.js 16 Dashboard]
 
-    subgraph "Ingest & Multimodal Extraction Pipeline"
-        Client -->|POST /api/upload| IngestHandler[⚡ Multipart File Streamer]
-        IngestHandler --> VisionEngine[👁️ Multimodal Vision Engine: Gemini 2.5]
-        VisionEngine -->|Strict JSON Schema Enforcement| SchemaValidator[📐 Schema Validator & Math Reconciler]
+    subgraph "Extraction & Parsing"
+        Frontend -->|POST /api/extract| Extractor[Multimodal Vision Pipeline]
+        Extractor --> VisionModel[Google Gemini 2.5 Flash]
+        VisionModel -->|Strict JSON Output| Validator[Schema Validator & Type Guard]
     end
 
-    subgraph "Verification & Arithmetic Reconciler"
-        SchemaValidator -->|Sum of Line Items == Subtotal?| MathCheck{Reconciled?}
-        MathCheck -->|Pass| ConfidenceScorer[🎯 Confidence Scoring & Tax Classifier]
-        MathCheck -->|Discrepancy| FlagAnomaly[⚠️ Flag Anomaly & Math Warning]
+    subgraph "Verification & Math Reconciliation"
+        Validator --> MathCheck{Line Sum == Total?}
+        MathCheck -->|Verified| Scorer[Confidence Scorer & Classifier]
+        MathCheck -->|Mismatch| Flag[Flag Discrepancy & Anomaly Warning]
     end
 
-    subgraph "Persistence & Telemetry"
-        ConfidenceScorer --> DB[(🐘 PostgreSQL Database via Prisma ORM)]
-        FlagAnomaly --> DB
-        DB <--> InvoicesView[📑 Invoices List & Verification Drawer]
+    subgraph "Persistence & Reporting"
+        Scorer --> DB[(PostgreSQL via Prisma ORM)]
+        Flag --> DB
+        DB <--> InvoicesView[Invoices List, Filters & Detail Drawers]
     end
 
     subgraph "Conversational AP Copilot"
-        User <-->|Conversational Query: 'What is our Q1 vendor spend?'| ChatEngine[🤖 AP Copilot Engine: /api/chat]
-        ChatEngine <-->|Contextual RAG & SQL Tool Query| DB
+        User <-->|Natural Language Queries| ChatAPI[/api/chat]
+        ChatAPI <-->|Contextual Schema Search| DB
     end
 ```
 
 ---
 
-## 🌟 Key Features
+## Core Engineering Highlights
 
 ### 1. Zero-Shot Multimodal Document Parsing
-* **Layout Agnostic:** Handles multi-column invoices, handwritten notes, tilted mobile camera photos, and digital PDF receipts without custom OCR templates.
-* **Granular Line-Item Extraction:** Accurately isolates descriptions, quantities, unit prices, individual tax percentages, and line totals with 99%+ schema reliability.
+* **Layout Independence:** Accommodates skewed mobile photos, multi-page PDFs, and international receipts without pre-configured bounding boxes or OCR templates.
+* **Granular Extraction:** Extracts vendor information, invoice IDs, issue/due dates, currencies, line-item descriptions, quantities, unit prices, tax brackets, and totals.
 
-### 2. Autonomous Arithmetic Reconciliation
-* **Mathematical Integrity Engine:** Automatically computes $\sum (\text{Qty} \times \text{Unit Price}) + \text{Tax} - \text{Discount}$ and cross-references against the stated invoice total.
-* **Anomaly Detection:** Instantly flags duplicate billings, price discrepancies, unrecognized tax brackets, and suspicious vendor bank coordinates.
+### 2. Server-Side Mathematical Reconciliation
+* Validates that $\sum (\text{Quantity} \times \text{Unit Price}) + \text{Tax} - \text{Discount} = \text{Total}$.
+* Any discrepancy generates an explicit arithmetic warning in the dashboard, safeguarding against fraudulent or inaccurate billings.
 
-### 3. Conversational Accounts Payable (AP) Copilot
-* **Natural Language Queries:** Pose questions like *"How much have we paid to Acme Corp over the last 90 days?"* or *"List all invoices with pending review status over $5,000."*
-* **Tool Grounding:** Conversational assistant executes schema-safe queries against the PostgreSQL database to deliver verified answers.
+### 3. Relational Persistence via Prisma ORM
+* Backed by PostgreSQL with normalized relational models separating Invoices from LineItems and User audit trails.
+* Enforces status workflows (`PENDING`, `REVIEWED`, `APPROVED`, `REJECTED`) with historical timestamps.
 
-### 4. Enterprise Audit Trails & Export Engine
-* **Complete Auditability:** Every invoice transition (`PENDING` $\to$ `REVIEWED` $\to$ `APPROVED` $\to$ `REJECTED`) is recorded with timestamps and confidence scores.
-* **PDFKit Export:** Generates standardized summary statements and one-click JSON/CSV exports for enterprise ERP integration.
+### 4. Interactive AP Assistant
+* Natural language chat assistant built into the application allowing finance teams to query vendor spend (e.g., *"How much have we paid Acme Corp this month?"* or *"List all invoices awaiting approval"*).
 
 ---
 
-## 🗄️ Relational Database Schema (Prisma)
-
-The persistence layer is structured for high integrity:
+## Database Schema (Prisma)
 
 ```prisma
 model Invoice {
@@ -90,7 +89,7 @@ model Invoice {
   tax              Float?
   discount         Float?
   total            Float?
-  status           String       @default("PENDING") // PENDING, REVIEWED, APPROVED, REJECTED
+  status           String       @default("PENDING")
   processingStatus String       @default("PROCESSING")
   confidenceScore  Float?
   createdAt        DateTime     @default(now())
@@ -110,27 +109,27 @@ model LineItem {
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technologies |
 | :--- | :--- |
-| **Frontend** | Next.js 16.4.0 (App Router), React 19.3.0, Lucide Icons, Sonner Notifications |
-| **Backend & APIs** | Next.js Server Actions & Route Handlers |
-| **Database & ORM** | PostgreSQL, Prisma ORM 5.22 |
-| **Multimodal Extraction** | Google Gemini 2.5 Flash / Vision via `@google/genai` |
-| **Document Export** | PDFKit, Date-fns, React-Markdown |
-| **Analytics & UI** | Recharts, Next-Themes (Dark/Light mode support) |
+| **Frontend** | Next.js 16.4 (App Router), React 19.3, Lucide Icons, Sonner |
+| **Backend & Routing** | Next.js Server Actions & API Route Handlers |
+| **Database** | PostgreSQL, Prisma ORM 5.22 |
+| **Vision Extraction** | Google Gemini 2.5 Flash via `@google/genai` |
+| **Analytics & UI** | Recharts, PDFKit, Date-fns |
+| **Deployment** | Vercel Serverless Edge Network |
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
-* **Node.js**: `v20.0.0` or higher
-* **PostgreSQL** instance (local Docker container, Supabase, Neon, or Railway)
-* **Google Gemini API Key**
+* Node.js 20.0 or higher
+* PostgreSQL database instance (local or hosted via Supabase/Neon/Railway)
+* Gemini API Key
 
-### Installation
+### Local Setup
 
 1. **Clone the repository:**
    ```bash
@@ -143,31 +142,26 @@ model LineItem {
    npm install
    ```
 
-3. **Configure Environment Variables:**
-   Create a `.env` file in the project root:
+3. **Configure environment variables:**
+   Create a `.env` file:
    ```env
-   # PostgreSQL Connection String
    POSTGRES_URL="postgresql://user:password@localhost:5432/invoice_db?schema=public"
-
-   # Google Gemini API Key
-   GEMINI_API_KEY="your_gemini_api_key_here"
+   GEMINI_API_KEY="your_gemini_api_key"
    ```
 
-4. **Synchronize Database Schema:**
+4. **Sync database schema:**
    ```bash
    npx prisma db push
    ```
 
-5. **Start the Development Server:**
+5. **Start development server:**
    ```bash
    npm run dev
    ```
-
-6. **Open the Application:**
-   Navigate to [http://localhost:3000](http://localhost:3000) to upload your first invoice.
+   Open `http://localhost:3000` to view the app locally.
 
 ---
 
-## 📄 License
+## License
 
-This project is open-source under the [MIT License](LICENSE).
+MIT License. See [LICENSE](LICENSE) for details.

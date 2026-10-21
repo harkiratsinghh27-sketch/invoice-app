@@ -35,6 +35,16 @@ yarn-error.log*
 
 # vercel
 .vercel
+*.log
+AGENTS.md
+CLAUDE.md
+.agents/
+.claude/
+.cursor/
+.devin/
+check_site.py
+test-*.js
+generate-*.js
 
 # typescript
 *.tsbuildinfo
